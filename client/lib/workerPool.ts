@@ -275,6 +275,15 @@ export class WorkerPool {
     trending: TokenPair[];
     total: number;
   }> {
+    // Check cache for comprehensive data
+    const cacheKey = this.getCacheKey("FETCH_COMPREHENSIVE", {});
+    const cachedResult = this.getCachedData(cacheKey);
+
+    if (cachedResult) {
+      console.log(`📦 Using cached comprehensive data (${cachedResult.total} tokens)`);
+      return cachedResult;
+    }
+
     const [tokensResult, trendingResult] = await Promise.allSettled([
       this.execute("FETCH_TOKENS", { params: { limit: "200" } }),
       this.execute("FETCH_TRENDING"),
@@ -306,11 +315,17 @@ export class WorkerPool {
       [],
     );
 
-    return {
+    const result = {
       tokens: uniqueTokens,
       trending,
       total: uniqueTokens.length,
     };
+
+    // Cache the comprehensive result
+    this.setCachedData(cacheKey, result);
+    console.log(`💾 Cached comprehensive data (${result.total} tokens) for 35 minutes`);
+
+    return result;
   }
 
   terminate() {
