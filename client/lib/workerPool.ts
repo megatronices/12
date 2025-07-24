@@ -299,6 +299,74 @@ export class WorkerPool {
     this.initialized = false;
   }
 
+  private getCacheKey(type: string, payload: any = {}): string {
+    return `${this.CACHE_KEY_PREFIX}${type}-${JSON.stringify(payload)}`;
+  }
+
+  private getCachedData(key: string): any | null {
+    try {
+      const cached = localStorage.getItem(key);
+      if (!cached) return null;
+
+      const parsedCache: CachedData = JSON.parse(cached);
+
+      if (Date.now() > parsedCache.expiry) {
+        localStorage.removeItem(key);
+        return null;
+      }
+
+      console.log(`📦 Cache hit for ${key} (${Math.round((parsedCache.expiry - Date.now()) / (60 * 1000))}m remaining)`);
+      return parsedCache.data;
+    } catch (error) {
+      console.warn("Cache read error:", error);
+      return null;
+    }
+  }
+
+  private setCachedData(key: string, data: any): void {
+    try {
+      const cached: CachedData = {
+        data,
+        timestamp: Date.now(),
+        expiry: Date.now() + this.CACHE_DURATION,
+      };
+
+      localStorage.setItem(key, JSON.stringify(cached));
+      console.log(`💾 Data cached for ${key} (expires in ${this.CACHE_DURATION / (60 * 1000)}m)`);
+    } catch (error) {
+      console.warn("Cache write error:", error);
+    }
+  }
+
+  private clearExpiredCache(): void {
+    try {
+      const keysToRemove: string[] = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith(this.CACHE_KEY_PREFIX)) {
+          try {
+            const cached = localStorage.getItem(key);
+            if (cached) {
+              const parsedCache: CachedData = JSON.parse(cached);
+              if (Date.now() > parsedCache.expiry) {
+                keysToRemove.push(key);
+              }
+            }
+          } catch (error) {
+            keysToRemove.push(key);
+          }
+        }
+      }
+
+      keysToRemove.forEach(key => localStorage.removeItem(key));
+      if (keysToRemove.length > 0) {
+        console.log(`🧹 Cleared ${keysToRemove.length} expired cache entries`);
+      }
+    } catch (error) {
+      console.warn("Cache cleanup error:", error);
+    }
+  }
+
   getStats() {
     return {
       totalWorkers: this.workers.length,
