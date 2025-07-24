@@ -423,7 +423,7 @@ export function filterTokens(
   filters: TokenFilter,
 ): TokenPair[] {
   console.log(
-    `🔍 Filtering ${tokens.length} tokens with MA filter: ${filters.onlyWithMA}`,
+    `🔍 Filtering ${tokens.length} tokens with MA filter: ${filters.onlyWithMA}, maxMarketCap: ${filters.maxMarketCap}`,
   );
 
   const filtered = tokens.filter((token) => {
@@ -435,11 +435,16 @@ export function filterTokens(
       return false;
     }
 
+    // Safety filter: only show tokens under 2M market cap for lower risk
+    if (filters.maxMarketCap && token.marketCap && token.marketCap > filters.maxMarketCap) {
+      return false;
+    }
+
     // All other filters are ignored - no volume, buy pressure, age, or liquidity restrictions
     return true;
   });
 
-  console.log(`✅ Found ${filtered.length} tokens after filtering`);
+  console.log(`✅ Found ${filtered.length} tokens after filtering (under ${filters.maxMarketCap ? '$' + (filters.maxMarketCap / 1000000).toFixed(1) + 'M' : 'no'} market cap limit)`);
   return filtered;
 }
 
