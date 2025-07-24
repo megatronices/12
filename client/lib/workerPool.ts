@@ -57,6 +57,9 @@ export class WorkerPool {
           { type: "module" },
         );
 
+        // Assign proxy to this worker
+        const assignedProxy = proxyRotator.assignProxyToWorker(id);
+
         const poolWorker: PoolWorker = {
           worker,
           busy: false,
