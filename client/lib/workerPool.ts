@@ -214,6 +214,15 @@ export class WorkerPool {
   }
 
   async fetchMultipleEndpoints(endpoints: string[]): Promise<TokenPair[]> {
+    // Check cache for the combined endpoints query
+    const cacheKey = this.getCacheKey("FETCH_MULTIPLE", { endpoints });
+    const cachedResult = this.getCachedData(cacheKey);
+
+    if (cachedResult) {
+      console.log(`📦 Using cached data for ${endpoints.length} endpoints`);
+      return cachedResult;
+    }
+
     const promises = endpoints.map((endpoint) =>
       this.execute("FETCH_SPECIFIC", { endpoint }),
     );
@@ -249,6 +258,10 @@ export class WorkerPool {
         },
         [],
       );
+
+      // Cache the result
+      this.setCachedData(cacheKey, uniquePairs);
+      console.log(`💾 Cached ${uniquePairs.length} tokens from ${endpoints.length} endpoints`);
 
       return uniquePairs;
     } catch (error) {
