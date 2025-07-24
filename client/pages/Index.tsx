@@ -62,6 +62,7 @@ import { NotificationSettings } from "../components/NotificationSettings";
 import { TelegramSettings } from "../components/TelegramSettings";
 import { notificationService } from "../lib/notifications";
 import { telegramService } from "../lib/telegramService";
+import { continuousScanner } from "../lib/continuousScanner";
 
 export default function Index() {
   const [tokens, setTokens] = useState<TokenPair[]>([]);
@@ -84,6 +85,8 @@ export default function Index() {
   const [telegramStats, setTelegramStats] = useState(
     telegramService.getStats(),
   );
+  const [scannerStats, setScannerStats] = useState(continuousScanner.getStats());
+  const [isAutoScanEnabled, setIsAutoScanEnabled] = useState(true);
   const [showCriteria, setShowCriteria] = useState(false);
   const [filters, setFilters] = useState<TokenFilter>({
     minVolume5m: 0, // Remove volume restriction
@@ -98,78 +101,83 @@ export default function Index() {
       setLoading(true);
       setError(null);
 
-      // Update worker stats
+      // Update stats
       setWorkerStats(getWorkerPoolStats());
+      setScannerStats(continuousScanner.getStats());
 
-      const data =
-        fetchMode === "comprehensive"
+      // If continuous scanner is running, get tokens from it
+      let data: TokenPair[];
+      if (isAutoScanEnabled && scannerStats.isRunning) {
+        data = continuousScanner.getAllTokens();
+        console.log(`Loaded ${data.length} tokens from continuous scanner`);
+      } else {
+        // Fallback to manual fetch
+        data = fetchMode === "comprehensive"
           ? await fetchMultipleDataSources()
           : await fetchSolanaTokens();
+        console.log(`Loaded ${data.length} tokens using ${fetchMode} mode`);
+      }
 
-      console.log(`Loaded ${data.length} tokens using ${fetchMode} mode`);
       setTokens(data);
       setLastUpdate(new Date());
 
-      // Check for new bullish signals and send notifications
-      try {
-        const newNotifications =
-          await notificationService.checkAndNotifyNewSignals(data);
-        if (newNotifications > 0) {
-          setNotificationsSent((prev) => prev + newNotifications);
-          console.log(`Sent ${newNotifications} desktop notifications`);
-        }
-
-        // Send Telegram alerts for ultra-strong signals
-        let telegramAlertsSent = 0;
-        for (const token of data) {
-          try {
-            const sent =
-              await telegramService.sendUltraStrongSignalAlert(token);
-            if (sent) {
-              telegramAlertsSent++;
-            }
-          } catch (error) {
-            console.warn(
-              `Failed to send Telegram alert for ${token.baseToken.symbol}:`,
-              error,
-            );
-          }
-        }
-
-        if (telegramAlertsSent > 0) {
-          console.log(`Sent ${telegramAlertsSent} Telegram alerts`);
-        }
-      } catch (error) {
-        console.warn("Failed to send notifications:", error);
-      }
-
-      // Update worker stats after fetch
+      // Update stats after fetch
       setWorkerStats(getWorkerPoolStats());
+      setScannerStats(continuousScanner.getStats());
     } catch (err) {
       console.error("Error loading tokens:", err);
       setError(err instanceof Error ? err.message : "Failed to load tokens");
     } finally {
       setLoading(false);
     }
-  }, [fetchMode]);
+  }, [fetchMode, isAutoScanEnabled, scannerStats.isRunning]);
 
   useEffect(() => {
+    // Start continuous scanner on mount
+    if (isAutoScanEnabled) {
+      continuousScanner.start().then(() => {
+        console.log('🚀 Continuous scanner started automatically');
+      });
+    }
+
     loadTokens();
 
-    // Refresh every 30 seconds (with 35-minute caching)
-    const interval = setInterval(loadTokens, 30000);
+    // More aggressive refresh - every 5 seconds when continuous scanner is active
+    const refreshInterval = isAutoScanEnabled ? 5000 : 15000;
+    const interval = setInterval(loadTokens, refreshInterval);
 
-    // Update worker stats every 5 seconds
+    // Update all stats every 2 seconds for real-time monitoring
     const statsInterval = setInterval(() => {
       setWorkerStats(getWorkerPoolStats());
       setTelegramStats(telegramService.getStats());
-    }, 5000);
+      setScannerStats(continuousScanner.getStats());
+    }, 2000);
 
     return () => {
       clearInterval(interval);
       clearInterval(statsInterval);
     };
-  }, [loadTokens]);
+  }, [loadTokens, isAutoScanEnabled]);
+
+  // Handle auto-scan toggle
+  const toggleAutoScan = useCallback(async () => {
+    if (isAutoScanEnabled) {
+      continuousScanner.stop();
+      setIsAutoScanEnabled(false);
+      console.log('�� Continuous scanning stopped');
+    } else {
+      await continuousScanner.start();
+      setIsAutoScanEnabled(true);
+      console.log('🚀 Continuous scanning started');
+    }
+  }, [isAutoScanEnabled]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      continuousScanner.stop();
+    };
+  }, []);
 
   useEffect(() => {
     let filtered = filterTokens(tokens, filters);
@@ -220,6 +228,11 @@ export default function Index() {
                 <span className="text-blue-600 dark:text-blue-400">
                   {workerStats.busyWorkers} active
                 </span>
+                {scannerStats.isRunning && (
+                  <span className="text-green-600 dark:text-green-400 font-semibold">
+                    AUTO-SCAN #{scannerStats.scanCounter}
+                  </span>
+                )}
                 {workerStats.queuedTasks > 0 && (
                   <span className="text-orange-600">
                     {workerStats.queuedTasks} queued
@@ -245,6 +258,21 @@ export default function Index() {
               )}
               <div className="flex gap-2">
                 <Button
+                  onClick={toggleAutoScan}
+                  variant={isAutoScanEnabled ? "default" : "outline"}
+                  size="sm"
+                  className={cn(
+                    "gap-2",
+                    isAutoScanEnabled && "bg-green-600 hover:bg-green-700 text-white"
+                  )}
+                >
+                  <Activity className={cn(
+                    "h-4 w-4",
+                    isAutoScanEnabled && "animate-pulse"
+                  )} />
+                  {isAutoScanEnabled ? "AUTO-SCAN ON" : "START AUTO-SCAN"}
+                </Button>
+                <Button
                   onClick={() =>
                     setFetchMode(
                       fetchMode === "standard" ? "comprehensive" : "standard",
@@ -266,7 +294,7 @@ export default function Index() {
                   <RefreshCw
                     className={cn("h-4 w-4", loading && "animate-spin")}
                   />
-                  Refresh
+                  Manual Refresh
                 </Button>
               </div>
             </div>
