@@ -151,10 +151,10 @@ class ContinuousScanner {
   }
 
   private startHighFrequencyScans(): void {
-    // Ultra-fast scans every 2 seconds
-    const ultraFastInterval = setInterval(async () => {
+    // Regular trending scans every 30 seconds
+    const trendingInterval = setInterval(async () => {
       if (!this.isRunning) return;
-      
+
       try {
         // Quick trending check
         const trending = await workerPool.execute('FETCH_TRENDING');
@@ -162,9 +162,9 @@ class ContinuousScanner {
           await this.processNotifications(trending.pairs);
         }
       } catch (error) {
-        console.warn('⚠️ Ultra-fast scan failed:', error);
+        console.warn('⚠️ Trending scan failed:', error);
       }
-    }, 2000);
+    }, 30000);
     
     this.scanIntervals.push(ultraFastInterval);
 
