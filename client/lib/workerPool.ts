@@ -261,7 +261,9 @@ export class WorkerPool {
 
       // Cache the result
       this.setCachedData(cacheKey, uniquePairs);
-      console.log(`💾 Cached ${uniquePairs.length} tokens from ${endpoints.length} endpoints`);
+      console.log(
+        `💾 Cached ${uniquePairs.length} tokens from ${endpoints.length} endpoints`,
+      );
 
       return uniquePairs;
     } catch (error) {
@@ -280,7 +282,9 @@ export class WorkerPool {
     const cachedResult = this.getCachedData(cacheKey);
 
     if (cachedResult) {
-      console.log(`📦 Using cached comprehensive data (${cachedResult.total} tokens)`);
+      console.log(
+        `📦 Using cached comprehensive data (${cachedResult.total} tokens)`,
+      );
       return cachedResult;
     }
 
@@ -323,7 +327,9 @@ export class WorkerPool {
 
     // Cache the comprehensive result
     this.setCachedData(cacheKey, result);
-    console.log(`💾 Cached comprehensive data (${result.total} tokens) for 35 minutes`);
+    console.log(
+      `💾 Cached comprehensive data (${result.total} tokens) for 35 minutes`,
+    );
 
     return result;
   }
@@ -358,7 +364,9 @@ export class WorkerPool {
         return null;
       }
 
-      console.log(`📦 Cache hit for ${key} (${Math.round((parsedCache.expiry - Date.now()) / (60 * 1000))}m remaining)`);
+      console.log(
+        `📦 Cache hit for ${key} (${Math.round((parsedCache.expiry - Date.now()) / (60 * 1000))}m remaining)`,
+      );
       return parsedCache.data;
     } catch (error) {
       console.warn("Cache read error:", error);
@@ -375,7 +383,9 @@ export class WorkerPool {
       };
 
       localStorage.setItem(key, JSON.stringify(cached));
-      console.log(`💾 Data cached for ${key} (expires in ${this.CACHE_DURATION / (60 * 1000)}m)`);
+      console.log(
+        `💾 Data cached for ${key} (expires in ${this.CACHE_DURATION / (60 * 1000)}m)`,
+      );
     } catch (error) {
       console.warn("Cache write error:", error);
     }
@@ -401,7 +411,7 @@ export class WorkerPool {
         }
       }
 
-      keysToRemove.forEach(key => localStorage.removeItem(key));
+      keysToRemove.forEach((key) => localStorage.removeItem(key));
       if (keysToRemove.length > 0) {
         console.log(`🧹 Cleared ${keysToRemove.length} expired cache entries`);
       }

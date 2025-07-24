@@ -85,7 +85,9 @@ export class NotificationService {
 
     // For denied permissions, try to guide user through browser settings
     if (Notification.permission === "denied") {
-      console.warn("Notifications are denied. User needs to manually enable in browser settings.");
+      console.warn(
+        "Notifications are denied. User needs to manually enable in browser settings.",
+      );
       return false;
     }
 
@@ -114,11 +116,13 @@ export class NotificationService {
     this.notificationHistory = [];
 
     // Force browser to re-evaluate permission
-    this.requestPermission().then(granted => {
+    this.requestPermission().then((granted) => {
       if (granted) {
         console.log("✅ Desktop notifications reset and working!");
       } else {
-        console.log("❌ Desktop notifications still blocked - check browser settings");
+        console.log(
+          "❌ Desktop notifications still blocked - check browser settings",
+        );
       }
     });
   }

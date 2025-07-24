@@ -187,7 +187,9 @@ export function NotificationSettings() {
                   onClick={() => {
                     notificationService.resetPermissions();
                     setTimeout(() => {
-                      setPermissionStatus(notificationService.getPermissionStatus());
+                      setPermissionStatus(
+                        notificationService.getPermissionStatus(),
+                      );
                     }, 1000);
                   }}
                   className="text-xs h-7"
@@ -196,14 +198,17 @@ export function NotificationSettings() {
                 </Button>
               </div>
             )}
-            {(permissionStatus === "denied" || permissionStatus === "default") && (
+            {(permissionStatus === "denied" ||
+              permissionStatus === "default") && (
               <Button
                 size="sm"
                 variant="outline"
                 onClick={() => {
                   notificationService.resetPermissions();
                   setTimeout(() => {
-                    setPermissionStatus(notificationService.getPermissionStatus());
+                    setPermissionStatus(
+                      notificationService.getPermissionStatus(),
+                    );
                   }, 1000);
                 }}
                 className="text-xs h-7"

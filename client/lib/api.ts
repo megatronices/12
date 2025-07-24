@@ -245,7 +245,8 @@ function calculateMACDCrossover(pair: TokenPair): {
 
   // Standard 5-minute MACD calculation
   const fastEMA = priceChange5m * 0.8 + priceChange1h * 0.2;
-  const slowEMA = priceChange1h * 0.5 + priceChange6h * 0.3 + priceChange24h * 0.2;
+  const slowEMA =
+    priceChange1h * 0.5 + priceChange6h * 0.3 + priceChange24h * 0.2;
   const macdLine = fastEMA - slowEMA;
   const signalLine = macdLine * 0.6 + (priceChange1h - priceChange6h) * 0.4;
   const histogram = macdLine - signalLine;
@@ -259,7 +260,8 @@ function calculateMACDCrossover(pair: TokenPair): {
   const thirtyMinFastEMA = thirtyMinPrice * 0.7 + priceChange1h * 0.3;
   const thirtyMinSlowEMA = priceChange1h * 0.4 + priceChange6h * 0.6;
   const thirtyMinMACDLine = thirtyMinFastEMA - thirtyMinSlowEMA;
-  const thirtyMinSignalLine = thirtyMinMACDLine * 0.7 + (priceChange1h - priceChange6h) * 0.3;
+  const thirtyMinSignalLine =
+    thirtyMinMACDLine * 0.7 + (priceChange1h - priceChange6h) * 0.3;
   const thirtyMinHistogram = thirtyMinMACDLine - thirtyMinSignalLine;
 
   // Enhanced 30-minute crossover conditions
