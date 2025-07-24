@@ -44,6 +44,8 @@ class ContinuousScanner {
 
   private lastResults: Map<string, TokenPair[]> = new Map();
   private scanCounter = 0;
+  private rateLimitHits = 0;
+  private lastRateLimitTime: number | null = null;
   
   async start(): Promise<void> {
     if (this.isRunning) {
