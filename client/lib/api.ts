@@ -226,50 +226,104 @@ function calculateMACDCrossover(pair: TokenPair): {
   macdLine: number;
   signalLine: number;
   histogram: number;
+  thirtyMinuteCrossover: boolean;
 } {
-  // Simulate MACD calculation using available price change data
-  // MACD = 12-period EMA - 26-period EMA
-  // Signal = 9-period EMA of MACD
-  // We'll approximate using different timeframes as periods
-
+  // Enhanced MACD calculation with 30-minute timeframe analysis
   const priceChange5m = pair.priceChange?.m5 || 0;
   const priceChange1h = pair.priceChange?.h1 || 0;
   const priceChange6h = pair.priceChange?.h6 || 0;
   const priceChange24h = pair.priceChange?.h24 || 0;
 
-  // Simulate 12-period EMA (fast line) using 5m and 1h data
+  // Standard 5-minute MACD calculation
   const fastEMA = priceChange5m * 0.8 + priceChange1h * 0.2;
-
-  // Simulate 26-period EMA (slow line) using 1h, 6h, and 24h data
-  const slowEMA =
-    priceChange1h * 0.5 + priceChange6h * 0.3 + priceChange24h * 0.2;
-
-  // MACD Line = Fast EMA - Slow EMA
+  const slowEMA = priceChange1h * 0.5 + priceChange6h * 0.3 + priceChange24h * 0.2;
   const macdLine = fastEMA - slowEMA;
-
-  // Signal Line (9-period EMA of MACD) - approximate using weighted average
   const signalLine = macdLine * 0.6 + (priceChange1h - priceChange6h) * 0.4;
-
-  // Histogram = MACD - Signal
   const histogram = macdLine - signalLine;
 
-  // Bullish crossover conditions:
-  // 1. MACD line is above signal line (positive histogram)
-  // 2. MACD line is positive (above zero line)
-  // 3. Recent momentum supports the crossover (5m change positive)
-  // 4. Histogram is increasing (approximated by checking if MACD > Signal significantly)
+  // 30-minute timeframe MACD analysis (using 30m equivalent data)
+  // Approximate 30-minute data using weighted averages of available timeframes
+  const thirtyMinPrice = priceChange5m * 0.6 + priceChange1h * 0.4; // 30m approximation
+  const thirtyMinMA20 = priceChange1h * 0.6 + priceChange6h * 0.4; // Slower MA for 30m
 
-  const hasBullishCrossover =
+  // 30-minute MACD components
+  const thirtyMinFastEMA = thirtyMinPrice * 0.7 + priceChange1h * 0.3;
+  const thirtyMinSlowEMA = priceChange1h * 0.4 + priceChange6h * 0.6;
+  const thirtyMinMACDLine = thirtyMinFastEMA - thirtyMinSlowEMA;
+  const thirtyMinSignalLine = thirtyMinMACDLine * 0.7 + (priceChange1h - priceChange6h) * 0.3;
+  const thirtyMinHistogram = thirtyMinMACDLine - thirtyMinSignalLine;
+
+  // Enhanced 30-minute crossover conditions
+  const thirtyMinuteCrossover =
+    thirtyMinHistogram > 0 && // 30m MACD above signal
+    thirtyMinMACDLine > 0 && // 30m MACD above zero
+    thirtyMinPrice > 1.0 && // Strong 30-minute momentum
+    thirtyMinHistogram > 0.3; // Strong separation
+
+  // Standard bullish crossover conditions (5-minute)
+  const standardCrossover =
     histogram > 0 && // MACD above signal
     macdLine > 0 && // MACD above zero line
     priceChange5m > 0.5 && // Recent bullish momentum
     histogram > 0.2; // Strong separation between MACD and signal
+
+  // Combined crossover: both 5m and 30m must align
+  const hasBullishCrossover = standardCrossover && thirtyMinuteCrossover;
 
   return {
     hasBullishCrossover,
     macdLine,
     signalLine,
     histogram,
+    thirtyMinuteCrossover,
+  };
+}
+
+// New function for enhanced 30-minute MA crossover analysis
+function calculate30MinMASignals(pair: TokenPair): {
+  ma9CrossoverMA14: boolean;
+  ma20CrossoverMA50: boolean;
+  combinedMASignal: boolean;
+} {
+  const priceChange5m = pair.priceChange?.m5 || 0;
+  const priceChange1h = pair.priceChange?.h1 || 0;
+  const priceChange6h = pair.priceChange?.h6 || 0;
+  const priceChange24h = pair.priceChange?.h24 || 0;
+
+  // Simulate 30-minute MA values using weighted combinations
+  const current30mPrice = priceChange5m * 0.6 + priceChange1h * 0.4;
+
+  // Simulate MA9 (9-period MA on 30m chart)
+  const ma9_30m = priceChange5m * 0.4 + priceChange1h * 0.6;
+
+  // Simulate MA14 (14-period MA on 30m chart)
+  const ma14_30m = priceChange1h * 0.5 + priceChange6h * 0.5;
+
+  // Simulate MA20 (20-period MA on 30m chart)
+  const ma20_30m = priceChange1h * 0.4 + priceChange6h * 0.6;
+
+  // Simulate MA50 (50-period MA on 30m chart)
+  const ma50_30m = priceChange6h * 0.5 + priceChange24h * 0.5;
+
+  // MA9 > MA14 crossover on 30-minute chart
+  const ma9CrossoverMA14 =
+    ma9_30m > ma14_30m && // MA9 above MA14
+    current30mPrice > ma9_30m && // Price above MA9
+    priceChange5m > 1.0; // Recent bullish momentum
+
+  // MA20 > MA50 crossover on 30-minute chart
+  const ma20CrossoverMA50 =
+    ma20_30m > ma50_30m && // MA20 above MA50
+    ma9_30m > ma20_30m && // MA9 above MA20 (alignment)
+    priceChange1h > 0.5; // Sustained momentum
+
+  // Combined MA signal: both crossovers must occur
+  const combinedMASignal = ma9CrossoverMA14 && ma20CrossoverMA50;
+
+  return {
+    ma9CrossoverMA14,
+    ma20CrossoverMA50,
+    combinedMASignal,
   };
 }
 
