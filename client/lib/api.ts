@@ -169,9 +169,14 @@ export function hasMAAlert(pair: TokenPair): boolean {
   // 7. ULTRA-STRONG MA convergence
   const ultraStrongMA = checkUltraStrongMAConvergence(pair);
 
-  // 8. MACD BULLISH CROSSOVER on 5-minute timeframe
+  // 8. Enhanced MACD BULLISH CROSSOVER with 30-minute analysis
   const macdData = calculateMACDCrossover(pair);
   const macdBullishCrossover = macdData.hasBullishCrossover;
+  const thirtyMinMACD = macdData.thirtyMinuteCrossover;
+
+  // 9. Enhanced 30-minute MA crossover analysis
+  const ma30mData = calculate30MinMASignals(pair);
+  const ma30mCrossover = ma30mData.combinedMASignal;
 
   // 9. BREAKOUT confirmation - outperforming significantly
   const breakoutConfirmation =
