@@ -322,7 +322,7 @@ export default function Index() {
                       <div className="flex items-center gap-2">
                         <TrendingUp className="h-4 w-4 text-red-600" />
                         <span className="font-medium text-green-800 dark:text-green-200 text-sm">
-                          PRACTICAL SIGNAL MODE
+                          SAFE SIGNAL MODE (Under $2M MC)
                         </span>
                       </div>
                       {showCriteria ? (
