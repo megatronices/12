@@ -256,6 +256,8 @@ class ContinuousScanner {
       scanCounter: this.scanCounter,
       activeScans: this.scanIntervals.length,
       cachedResults: this.lastResults.size,
+      rateLimitHits: this.rateLimitHits,
+      lastRateLimitTime: this.lastRateLimitTime,
       workerStats,
     };
   }
