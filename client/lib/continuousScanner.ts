@@ -117,9 +117,14 @@ class ContinuousScanner {
           break;
       }
 
-      // Store results
+      // Store results, use fallback if empty due to rate limits
+      if (tokens.length === 0) {
+        console.log('📋 Using fallback data due to API limits');
+        tokens = getFallbackTokens();
+      }
+
       this.lastResults.set(`scan-${scanIndex}`, tokens);
-      
+
       // Process notifications for new signals
       await this.processNotifications(tokens);
       
