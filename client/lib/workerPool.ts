@@ -27,8 +27,8 @@ export class WorkerPool {
   private taskQueue: PendingTask[] = [];
   private initialized = false;
   private readonly WORKER_COUNT = 120; // Use all 120 workers for maximum performance
-  private readonly TASK_TIMEOUT = 30000; // 30 second timeout
-  private readonly CACHE_DURATION = 35 * 60 * 1000; // 35 minutes cache duration
+  private readonly TASK_TIMEOUT = 15000; // 15 second timeout for faster failures
+  private readonly CACHE_DURATION = 2 * 60 * 1000; // 2 minutes cache for high-frequency scanning
   private readonly CACHE_KEY_PREFIX = "bullish-scanner-cache-";
 
   async initialize(): Promise<void> {
