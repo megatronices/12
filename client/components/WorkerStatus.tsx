@@ -13,6 +13,11 @@ interface WorkerStats {
   queuedTasks: number;
 }
 
+interface ProxyStats {
+  totalProxies: number;
+  assignedWorkers: number;
+}
+
 export function WorkerStatus() {
   const [stats, setStats] = useState<WorkerStats>({
     totalWorkers: 0,
