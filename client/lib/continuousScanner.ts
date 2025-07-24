@@ -145,11 +145,17 @@ class ContinuousScanner {
       
       try {
         const data = await workerPool.execute('FETCH_SPECIFIC', { endpoint });
-        if (data?.pairs) {
+        if (data?.pairs && data.pairs.length > 0) {
           this.lastResults.set(`endpoint-${endpoint}`, data.pairs);
+        } else {
+          // Use fallback for this endpoint
+          const fallbackData = getFallbackTokens();
+          this.lastResults.set(`endpoint-${endpoint}`, fallbackData);
         }
       } catch (error) {
-        console.warn(`⚠️ Endpoint ${endpoint} failed:`, error);
+        console.warn(`⚠️ Endpoint ${endpoint} failed, using fallback:`, error);
+        const fallbackData = getFallbackTokens();
+        this.lastResults.set(`endpoint-${endpoint}`, fallbackData);
       }
     }, 10000); // Every 10 seconds to avoid rate limits
     
