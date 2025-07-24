@@ -25,6 +25,10 @@ export function WorkerStatus() {
     pendingTasks: 0,
     queuedTasks: 0,
   });
+  const [proxyStats, setProxyStats] = useState<ProxyStats>({
+    totalProxies: 0,
+    assignedWorkers: 0,
+  });
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
