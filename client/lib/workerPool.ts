@@ -171,6 +171,17 @@ export class WorkerPool {
       await this.initialize();
     }
 
+    // Clear expired cache entries periodically
+    this.clearExpiredCache();
+
+    // Check cache first
+    const cacheKey = this.getCacheKey(type, payload);
+    const cachedResult = this.getCachedData(cacheKey);
+
+    if (cachedResult) {
+      return cachedResult;
+    }
+
     const taskId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
     const message: WorkerMessage = {
@@ -183,7 +194,11 @@ export class WorkerPool {
       const task: PendingTask = {
         id: taskId,
         message,
-        resolve,
+        resolve: (data: T) => {
+          // Cache the result before resolving
+          this.setCachedData(cacheKey, data);
+          resolve(data);
+        },
         reject,
         timeout: null as any,
       };
