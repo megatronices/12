@@ -95,6 +95,7 @@ export default function Index() {
     maxAge: 0, // Remove age restriction
     minLiquidity: 0, // Remove liquidity restriction
     onlyWithMA: true, // Only show bullish crossover signals
+    maxMarketCap: 2000000, // Max 2M market cap for safety
   });
 
   const loadTokens = useCallback(async () => {
@@ -338,7 +339,7 @@ export default function Index() {
                         </p>
                         <ul className="text-xs text-green-600 dark:text-green-400 space-y-1">
                           <li>✅ Core: Strong momentum (≥2% in 5m)</li>
-                          <li>✅ Core: Good buy pressure (≥55%)</li>
+                          <li>✅ Core: Good buy pressure (���55%)</li>
                           <li>✅ Core: Positive trend direction</li>
                           <li>
                             • Supporting: Volume increase or decent volume
