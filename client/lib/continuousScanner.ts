@@ -131,7 +131,16 @@ class ContinuousScanner {
       await this.processNotifications(tokens);
       
     } catch (error) {
-      console.warn(`⚠️ Scan #${this.scanCounter} (Loop ${scanIndex}) failed:`, error);
+      if (error.message && error.message.includes('429')) {
+        this.rateLimitHits++;
+        this.lastRateLimitTime = Date.now();
+        console.warn(`⚠️ Rate limit hit #${this.rateLimitHits} - using fallback data`);
+        // Use fallback data
+        tokens = getFallbackTokens();
+        this.lastResults.set(`scan-${scanIndex}`, tokens);
+      } else {
+        console.warn(`⚠️ Scan #${this.scanCounter} (Loop ${scanIndex}) failed:`, error);
+      }
     }
   }
 
