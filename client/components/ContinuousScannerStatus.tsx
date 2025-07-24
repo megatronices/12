@@ -8,6 +8,8 @@ interface ContinuousScannerStatusProps {
     scanCounter: number;
     activeScans: number;
     cachedResults: number;
+    rateLimitHits?: number;
+    lastRateLimitTime?: number | null;
     workerStats: {
       totalWorkers: number;
       busyWorkers: number;
