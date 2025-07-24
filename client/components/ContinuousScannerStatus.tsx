@@ -118,6 +118,17 @@ export function ContinuousScannerStatus({ stats }: ContinuousScannerStatusProps)
                 </div>
               </div>
             )}
+
+            {stats.rateLimitHits && stats.rateLimitHits > 0 && (
+              <div className="p-2 bg-orange-50 dark:bg-orange-900/20 rounded-lg border border-orange-200 dark:border-orange-800">
+                <div className="flex items-center gap-2">
+                  <AlertTriangle className="h-3 w-3 text-orange-600" />
+                  <span className="text-xs text-orange-700 dark:text-orange-300">
+                    Rate limited {stats.rateLimitHits} times - using fallback data
+                  </span>
+                </div>
+              </div>
+            )}
           </>
         )}
       </CardContent>
