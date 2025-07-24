@@ -164,7 +164,17 @@ export class WorkerPool {
       }
     }, this.TASK_TIMEOUT);
 
-    worker.worker.postMessage(task.message);
+    // Add worker ID to message for proxy routing
+    const messageWithWorker = {
+      ...task.message,
+      workerId: worker.id
+    };
+
+    // Stagger requests to avoid overwhelming APIs
+    const delay = proxyRotator.getRequestDelay(worker.id);
+    setTimeout(() => {
+      worker.worker.postMessage(messageWithWorker);
+    }, delay);
   }
 
   async execute<T = any>(
