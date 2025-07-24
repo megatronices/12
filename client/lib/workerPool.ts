@@ -26,7 +26,7 @@ export class WorkerPool {
   private pendingTasks: PendingTask[] = [];
   private taskQueue: PendingTask[] = [];
   private initialized = false;
-  private readonly WORKER_COUNT = 20; // Use 20 workers for optimal performance
+  private readonly WORKER_COUNT = 120; // Use all 120 workers for maximum performance
   private readonly TASK_TIMEOUT = 30000; // 30 second timeout
   private readonly CACHE_DURATION = 35 * 60 * 1000; // 35 minutes cache duration
   private readonly CACHE_KEY_PREFIX = "bullish-scanner-cache-";
