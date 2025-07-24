@@ -86,12 +86,12 @@ export async function fetchMultipleDataSources(): Promise<TokenPair[]> {
         const buyPressure = total > 0 ? (buys5m / total) * 100 : 0;
         const priceChange5m = pair.priceChange?.m5 || 0;
 
-        // Much more selective pre-filtering for ultra-strong signals
+        // Selective pre-filtering for signals (no mcap limit)
         return (
-          total > 10 && // Meaningful transaction volume
-          buyPressure >= 60 && // Strong buy pressure
-          priceChange5m >= 3
-        ); // Significant price movement
+          total > 5 && // Meaningful transaction volume (reduced)
+          buyPressure >= 55 && // Good buy pressure (reduced)
+          priceChange5m >= 2 // Good price movement (reduced)
+        );
       })
       .sort((a, b) => {
         // Sort by 5m price change first (best momentum first)
