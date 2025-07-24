@@ -15,6 +15,12 @@ interface PendingTask {
   timeout: NodeJS.Timeout;
 }
 
+interface CachedData {
+  data: any;
+  timestamp: number;
+  expiry: number;
+}
+
 export class WorkerPool {
   private workers: PoolWorker[] = [];
   private pendingTasks: PendingTask[] = [];
@@ -22,6 +28,8 @@ export class WorkerPool {
   private initialized = false;
   private readonly WORKER_COUNT = 20; // Use 20 workers for optimal performance
   private readonly TASK_TIMEOUT = 30000; // 30 second timeout
+  private readonly CACHE_DURATION = 35 * 60 * 1000; // 35 minutes cache duration
+  private readonly CACHE_KEY_PREFIX = "bullish-scanner-cache-";
 
   async initialize(): Promise<void> {
     if (this.initialized) return;
@@ -163,6 +171,17 @@ export class WorkerPool {
       await this.initialize();
     }
 
+    // Clear expired cache entries periodically
+    this.clearExpiredCache();
+
+    // Check cache first
+    const cacheKey = this.getCacheKey(type, payload);
+    const cachedResult = this.getCachedData(cacheKey);
+
+    if (cachedResult) {
+      return cachedResult;
+    }
+
     const taskId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
     const message: WorkerMessage = {
@@ -175,7 +194,11 @@ export class WorkerPool {
       const task: PendingTask = {
         id: taskId,
         message,
-        resolve,
+        resolve: (data: T) => {
+          // Cache the result before resolving
+          this.setCachedData(cacheKey, data);
+          resolve(data);
+        },
         reject,
         timeout: null as any,
       };
@@ -191,6 +214,15 @@ export class WorkerPool {
   }
 
   async fetchMultipleEndpoints(endpoints: string[]): Promise<TokenPair[]> {
+    // Check cache for the combined endpoints query
+    const cacheKey = this.getCacheKey("FETCH_MULTIPLE", { endpoints });
+    const cachedResult = this.getCachedData(cacheKey);
+
+    if (cachedResult) {
+      console.log(`📦 Using cached data for ${endpoints.length} endpoints`);
+      return cachedResult;
+    }
+
     const promises = endpoints.map((endpoint) =>
       this.execute("FETCH_SPECIFIC", { endpoint }),
     );
@@ -227,6 +259,12 @@ export class WorkerPool {
         [],
       );
 
+      // Cache the result
+      this.setCachedData(cacheKey, uniquePairs);
+      console.log(
+        `💾 Cached ${uniquePairs.length} tokens from ${endpoints.length} endpoints`,
+      );
+
       return uniquePairs;
     } catch (error) {
       console.error("Error fetching multiple endpoints:", error);
@@ -239,6 +277,17 @@ export class WorkerPool {
     trending: TokenPair[];
     total: number;
   }> {
+    // Check cache for comprehensive data
+    const cacheKey = this.getCacheKey("FETCH_COMPREHENSIVE", {});
+    const cachedResult = this.getCachedData(cacheKey);
+
+    if (cachedResult) {
+      console.log(
+        `📦 Using cached comprehensive data (${cachedResult.total} tokens)`,
+      );
+      return cachedResult;
+    }
+
     const [tokensResult, trendingResult] = await Promise.allSettled([
       this.execute("FETCH_TOKENS", { params: { limit: "200" } }),
       this.execute("FETCH_TRENDING"),
@@ -270,11 +319,19 @@ export class WorkerPool {
       [],
     );
 
-    return {
+    const result = {
       tokens: uniqueTokens,
       trending,
       total: uniqueTokens.length,
     };
+
+    // Cache the comprehensive result
+    this.setCachedData(cacheKey, result);
+    console.log(
+      `💾 Cached comprehensive data (${result.total} tokens) for 35 minutes`,
+    );
+
+    return result;
   }
 
   terminate() {
@@ -289,6 +346,78 @@ export class WorkerPool {
     this.pendingTasks = [];
     this.taskQueue = [];
     this.initialized = false;
+  }
+
+  private getCacheKey(type: string, payload: any = {}): string {
+    return `${this.CACHE_KEY_PREFIX}${type}-${JSON.stringify(payload)}`;
+  }
+
+  private getCachedData(key: string): any | null {
+    try {
+      const cached = localStorage.getItem(key);
+      if (!cached) return null;
+
+      const parsedCache: CachedData = JSON.parse(cached);
+
+      if (Date.now() > parsedCache.expiry) {
+        localStorage.removeItem(key);
+        return null;
+      }
+
+      console.log(
+        `📦 Cache hit for ${key} (${Math.round((parsedCache.expiry - Date.now()) / (60 * 1000))}m remaining)`,
+      );
+      return parsedCache.data;
+    } catch (error) {
+      console.warn("Cache read error:", error);
+      return null;
+    }
+  }
+
+  private setCachedData(key: string, data: any): void {
+    try {
+      const cached: CachedData = {
+        data,
+        timestamp: Date.now(),
+        expiry: Date.now() + this.CACHE_DURATION,
+      };
+
+      localStorage.setItem(key, JSON.stringify(cached));
+      console.log(
+        `💾 Data cached for ${key} (expires in ${this.CACHE_DURATION / (60 * 1000)}m)`,
+      );
+    } catch (error) {
+      console.warn("Cache write error:", error);
+    }
+  }
+
+  private clearExpiredCache(): void {
+    try {
+      const keysToRemove: string[] = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith(this.CACHE_KEY_PREFIX)) {
+          try {
+            const cached = localStorage.getItem(key);
+            if (cached) {
+              const parsedCache: CachedData = JSON.parse(cached);
+              if (Date.now() > parsedCache.expiry) {
+                keysToRemove.push(key);
+              }
+            }
+          } catch (error) {
+            keysToRemove.push(key);
+          }
+        }
+      }
+
+      keysToRemove.forEach((key) => localStorage.removeItem(key));
+      if (keysToRemove.length > 0) {
+        console.log(`🧹 Cleared ${keysToRemove.length} expired cache entries`);
+      }
+    } catch (error) {
+      console.warn("Cache cleanup error:", error);
+    }
   }
 
   getStats() {

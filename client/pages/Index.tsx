@@ -156,8 +156,8 @@ export default function Index() {
   useEffect(() => {
     loadTokens();
 
-    // Refresh every 15 seconds for real-time data
-    const interval = setInterval(loadTokens, 15000);
+    // Refresh every 30 seconds (with 35-minute caching)
+    const interval = setInterval(loadTokens, 30000);
 
     // Update worker stats every 5 seconds
     const statsInterval = setInterval(() => {
@@ -314,7 +314,7 @@ export default function Index() {
                           <li>
                             • Supporting: Volume increase or decent volume
                           </li>
-                          <li>• Supporting: Market cap under $1M</li>
+                          <li>• Supporting: No market cap limits</li>
                           <li>• Supporting: MACD crossover signal</li>
                           <li>• Supporting: Technical MA signals</li>
                           <li>• Need: 3+ supporting conditions</li>

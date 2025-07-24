@@ -83,17 +83,48 @@ export class NotificationService {
       return true;
     }
 
+    // For denied permissions, try to guide user through browser settings
     if (Notification.permission === "denied") {
+      console.warn(
+        "Notifications are denied. User needs to manually enable in browser settings.",
+      );
       return false;
     }
 
     try {
       const permission = await Notification.requestPermission();
-      return permission === "granted";
+      if (permission === "granted") {
+        console.log("✅ Notification permission granted!");
+        return true;
+      } else {
+        console.warn("❌ Notification permission denied");
+        return false;
+      }
     } catch (error) {
       console.error("Failed to request notification permission:", error);
       return false;
     }
+  }
+
+  // Force reset notification permission status
+  resetPermissions(): void {
+    console.log("🔄 Resetting notification permissions...");
+    // Clear any cached permission state
+    localStorage.removeItem(this.STORAGE_KEY);
+    localStorage.removeItem(this.KNOWN_TOKENS_KEY);
+    this.knownTokens.clear();
+    this.notificationHistory = [];
+
+    // Force browser to re-evaluate permission
+    this.requestPermission().then((granted) => {
+      if (granted) {
+        console.log("✅ Desktop notifications reset and working!");
+      } else {
+        console.log(
+          "❌ Desktop notifications still blocked - check browser settings",
+        );
+      }
+    });
   }
 
   getPermissionStatus(): NotificationPermission | "unsupported" {
