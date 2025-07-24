@@ -1,6 +1,7 @@
 import { workerPool } from './workerPool';
 import { notificationService } from './notifications';
 import { telegramService } from './telegramService';
+import { getFallbackTokens } from './fallbackData';
 import { TokenPair } from '@shared/types';
 
 class ContinuousScanner {
