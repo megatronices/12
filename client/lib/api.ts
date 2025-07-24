@@ -215,9 +215,11 @@ export function hasMAAlert(pair: TokenPair): boolean {
         consistentBullTrend: `${consistentBullTrend}`,
         acceleratingMomentum: `${acceleratingMomentum}`,
         volumeSupport: `${volumeSupport}`,
-        marketConditions: `${marketConditions} (MCap: ${marketCap})`,
+        marketConditions: `${marketConditions} (No MCap limit)`,
         ultraStrongMA: `${ultraStrongMA}`,
         macdBullishCrossover: `${macdBullishCrossover}`,
+        thirtyMinMACD: `${thirtyMinMACD}`,
+        ma30mCrossover: `${ma30mCrossover}`,
       },
       FINAL_RESULT: result
         ? "✅ SIGNAL FOUND!"
