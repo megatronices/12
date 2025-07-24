@@ -185,7 +185,7 @@ export function hasMAAlert(pair: TokenPair): boolean {
   // PRACTICAL APPROACH: Core conditions + supporting conditions
   const coreConditions = strongMomentum && goodBuyPressure && priceChange5m > 0;
 
-  // Count supporting conditions (need at least 3 of 6)
+  // Count supporting conditions (need at least 3 of 8 with enhanced 30m analysis)
   const supportingConditions = [
     consistentBullTrend,
     acceleratingMomentum,
@@ -193,6 +193,8 @@ export function hasMAAlert(pair: TokenPair): boolean {
     marketConditions,
     ultraStrongMA,
     macdBullishCrossover,
+    thirtyMinMACD,
+    ma30mCrossover,
   ].filter(Boolean).length;
 
   const result = coreConditions && supportingConditions >= 3;
