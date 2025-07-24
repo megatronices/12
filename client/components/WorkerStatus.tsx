@@ -2,8 +2,9 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Progress } from "./ui/progress";
-import { Activity, Zap, Clock, AlertCircle } from "lucide-react";
+import { Activity, Zap, Clock, AlertCircle, Shield } from "lucide-react";
 import { getWorkerPoolStats } from "../lib/api";
+import { proxyRotator } from "../lib/proxyRotator";
 
 interface WorkerStats {
   totalWorkers: number;
