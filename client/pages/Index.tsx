@@ -335,16 +335,16 @@ export default function Index() {
                     {showCriteria && (
                       <div className="mt-3">
                         <p className="text-sm text-green-700 dark:text-green-300 mb-2">
-                          PRACTICAL criteria - actionable trading signals:
+                          SAFE SIGNAL MODE - filtered for lower risk:
                         </p>
                         <ul className="text-xs text-green-600 dark:text-green-400 space-y-1">
                           <li>✅ Core: Strong momentum (≥2% in 5m)</li>
-                          <li>✅ Core: Good buy pressure (���55%)</li>
+                          <li>✅ Core: Good buy pressure (≥55%)</li>
                           <li>✅ Core: Positive trend direction</li>
                           <li>
                             • Supporting: Volume increase or decent volume
                           </li>
-                          <li>• Supporting: No market cap limits</li>
+                          <li>🛡️ <strong>SAFETY: Under $2M market cap only</strong></li>
                           <li>• Supporting: MACD crossover signal</li>
                           <li>• Supporting: Technical MA signals</li>
                           <li>• Need: 3+ supporting conditions</li>
