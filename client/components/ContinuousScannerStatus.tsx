@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
-import { Activity, Zap, Database, Clock } from "lucide-react";
+import { Activity, Zap, Database, Clock, AlertTriangle } from "lucide-react";
 
 interface ContinuousScannerStatusProps {
   stats: {
