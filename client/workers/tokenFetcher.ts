@@ -4,6 +4,7 @@ import { TokenPair } from "@shared/types";
 export interface WorkerMessage {
   id: string;
   type: "FETCH_TOKENS" | "FETCH_TRENDING" | "FETCH_SPECIFIC";
+  workerId?: string;
   payload: {
     endpoint?: string;
     params?: Record<string, any>;
