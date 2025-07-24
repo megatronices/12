@@ -170,15 +170,46 @@ export function NotificationSettings() {
               </Button>
             )}
             {permissionStatus === "granted" && (
+              <div className="flex gap-1">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={handleSendTestNotification}
+                  disabled={isSendingTest}
+                  className="text-xs h-7"
+                >
+                  <Bell className="h-3 w-3 mr-1" />
+                  {isSendingTest ? "Sending..." : "Test"}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    notificationService.resetPermissions();
+                    setTimeout(() => {
+                      setPermissionStatus(notificationService.getPermissionStatus());
+                    }, 1000);
+                  }}
+                  className="text-xs h-7"
+                >
+                  <RefreshCw className="h-3 w-3" />
+                </Button>
+              </div>
+            )}
+            {(permissionStatus === "denied" || permissionStatus === "default") && (
               <Button
                 size="sm"
                 variant="outline"
-                onClick={handleSendTestNotification}
-                disabled={isSendingTest}
+                onClick={() => {
+                  notificationService.resetPermissions();
+                  setTimeout(() => {
+                    setPermissionStatus(notificationService.getPermissionStatus());
+                  }, 1000);
+                }}
                 className="text-xs h-7"
               >
-                <Bell className="h-3 w-3 mr-1" />
-                {isSendingTest ? "Sending..." : "Test"}
+                <RefreshCw className="h-3 w-3 mr-1" />
+                Reset
               </Button>
             )}
           </div>
