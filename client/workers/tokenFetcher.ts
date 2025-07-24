@@ -27,6 +27,12 @@ export interface WorkerResponse {
 const API_BASE = "/api";
 
 class TokenFetcher {
+  private workerId: string = '';
+
+  setWorkerId(id: string) {
+    this.workerId = id;
+  }
+
   private async fetchWithRetry(
     url: string,
     maxRetries: number = 3,
@@ -35,8 +41,13 @@ class TokenFetcher {
 
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
+        // Get proxy configuration for this worker
+        const proxyConfig = proxyRotator.getProxyConfig(this.workerId);
+
         const response = await fetch(url, {
+          ...proxyConfig,
           headers: {
+            ...proxyConfig.headers,
             Accept: "application/json",
             "Content-Type": "application/json",
           },
