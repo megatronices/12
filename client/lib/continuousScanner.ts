@@ -166,20 +166,20 @@ class ContinuousScanner {
       }
     }, 30000);
     
-    this.scanIntervals.push(ultraFastInterval);
+    this.scanIntervals.push(trendingInterval);
 
-    // Batch endpoint scanning every 8 seconds
+    // Batch endpoint scanning every 45 seconds
     const batchInterval = setInterval(async () => {
       if (!this.isRunning) return;
-      
+
       try {
-        const batchEndpoints = this.getRandomEndpoints(12);
+        const batchEndpoints = this.getRandomEndpoints(6); // Reduced batch size
         const batchData = await workerPool.fetchMultipleEndpoints(batchEndpoints);
         await this.processNotifications(batchData);
       } catch (error) {
         console.warn('⚠️ Batch scan failed:', error);
       }
-    }, 8000);
+    }, 45000);
     
     this.scanIntervals.push(batchInterval);
   }
