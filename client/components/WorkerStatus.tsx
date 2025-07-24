@@ -34,7 +34,12 @@ export function WorkerStatus() {
   useEffect(() => {
     const updateStats = () => {
       const newStats = getWorkerPoolStats();
+      const newProxyStats = proxyRotator.getStats();
       setStats(newStats);
+      setProxyStats({
+        totalProxies: newProxyStats.totalProxies,
+        assignedWorkers: newProxyStats.assignedWorkers,
+      });
       setIsVisible(newStats.totalWorkers > 0);
     };
 
