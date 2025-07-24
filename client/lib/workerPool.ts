@@ -1,5 +1,6 @@
 import { TokenPair } from "@shared/types";
 import { WorkerMessage, WorkerResponse } from "../workers/tokenFetcher";
+import { proxyRotator } from "./proxyRotator";
 
 interface PoolWorker {
   worker: Worker;
