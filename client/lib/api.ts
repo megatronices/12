@@ -160,12 +160,11 @@ export function hasMAAlert(pair: TokenPair): boolean {
     (pair.volume?.m5 || 0) > (pair.volume?.h1 || 0) / 15 || // 4x normal (more lenient)
     (pair.volume?.m5 || 0) > 2000; // OR just decent volume
 
-  // 6. MARKET conditions (more flexible)
+  // 6. MARKET conditions (no mcap limit per user request)
   const ageInDays = (Date.now() / 1000 - pair.pairCreatedAt) / (24 * 60 * 60);
   const marketConditions =
-    marketCap < 1000000 && // Increased to $1M cap
-    (pair.volume?.m5 || 0) > 1000 && // Reduced volume requirement
-    ageInDays <= 180;
+    (pair.volume?.m5 || 0) > 500 && // Minimal volume requirement only
+    ageInDays <= 365; // Extended age limit to 1 year
 
   // 7. ULTRA-STRONG MA convergence
   const ultraStrongMA = checkUltraStrongMAConvergence(pair);
