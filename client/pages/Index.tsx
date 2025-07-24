@@ -60,6 +60,7 @@ import { cn } from "../lib/utils";
 import { WorkerStatus } from "../components/WorkerStatus";
 import { NotificationSettings } from "../components/NotificationSettings";
 import { TelegramSettings } from "../components/TelegramSettings";
+import { ContinuousScannerStatus } from "../components/ContinuousScannerStatus";
 import { notificationService } from "../lib/notifications";
 import { telegramService } from "../lib/telegramService";
 import { continuousScanner } from "../lib/continuousScanner";
@@ -164,7 +165,7 @@ export default function Index() {
     if (isAutoScanEnabled) {
       continuousScanner.stop();
       setIsAutoScanEnabled(false);
-      console.log('�� Continuous scanning stopped');
+      console.log('🛑 Continuous scanning stopped');
     } else {
       await continuousScanner.start();
       setIsAutoScanEnabled(true);
@@ -386,6 +387,8 @@ export default function Index() {
             </Card>
 
             <WorkerStatus />
+
+            <ContinuousScannerStatus stats={scannerStats} />
 
             <NotificationSettings />
 
