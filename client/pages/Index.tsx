@@ -314,7 +314,7 @@ export default function Index() {
                           <li>
                             • Supporting: Volume increase or decent volume
                           </li>
-                          <li>• Supporting: Market cap under $1M</li>
+                          <li>• Supporting: No market cap limits</li>
                           <li>• Supporting: MACD crossover signal</li>
                           <li>• Supporting: Technical MA signals</li>
                           <li>• Need: 3+ supporting conditions</li>
