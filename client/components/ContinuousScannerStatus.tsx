@@ -19,8 +19,12 @@ interface ContinuousScannerStatusProps {
   };
 }
 
-export function ContinuousScannerStatus({ stats }: ContinuousScannerStatusProps) {
-  const utilizationPercentage = Math.round((stats.workerStats.busyWorkers / stats.workerStats.totalWorkers) * 100);
+export function ContinuousScannerStatus({
+  stats,
+}: ContinuousScannerStatusProps) {
+  const utilizationPercentage = Math.round(
+    (stats.workerStats.busyWorkers / stats.workerStats.totalWorkers) * 100,
+  );
 
   return (
     <Card className="mt-4">
@@ -32,10 +36,16 @@ export function ContinuousScannerStatus({ stats }: ContinuousScannerStatusProps)
       </CardHeader>
       <CardContent className="space-y-3">
         <div className="flex items-center justify-between">
-          <span className="text-sm text-slate-600 dark:text-slate-400">Status</span>
-          <Badge 
+          <span className="text-sm text-slate-600 dark:text-slate-400">
+            Status
+          </span>
+          <Badge
             variant={stats.isRunning ? "default" : "secondary"}
-            className={stats.isRunning ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300" : ""}
+            className={
+              stats.isRunning
+                ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
+                : ""
+            }
           >
             {stats.isRunning ? "ACTIVE" : "STOPPED"}
           </Badge>
@@ -48,11 +58,15 @@ export function ContinuousScannerStatus({ stats }: ContinuousScannerStatusProps)
                 <Zap className="h-3 w-3" />
                 Scans Completed
               </span>
-              <span className="text-sm font-mono">{stats.scanCounter.toLocaleString()}</span>
+              <span className="text-sm font-mono">
+                {stats.scanCounter.toLocaleString()}
+              </span>
             </div>
 
             <div className="flex items-center justify-between">
-              <span className="text-sm text-slate-600 dark:text-slate-400">Active Scan Loops</span>
+              <span className="text-sm text-slate-600 dark:text-slate-400">
+                Active Scan Loops
+              </span>
               <span className="text-sm font-mono">{stats.activeScans}</span>
             </div>
 
@@ -66,33 +80,45 @@ export function ContinuousScannerStatus({ stats }: ContinuousScannerStatusProps)
 
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-slate-600 dark:text-slate-400">Worker Utilization</span>
-                <span className="text-sm font-mono">{utilizationPercentage}%</span>
+                <span className="text-sm text-slate-600 dark:text-slate-400">
+                  Worker Utilization
+                </span>
+                <span className="text-sm font-mono">
+                  {utilizationPercentage}%
+                </span>
               </div>
-              
+
               <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2">
-                <div 
+                <div
                   className="bg-blue-600 h-2 rounded-full transition-all duration-500"
                   style={{ width: `${utilizationPercentage}%` }}
                 />
               </div>
-              
+
               <div className="grid grid-cols-2 gap-2 text-xs">
                 <div className="flex justify-between">
                   <span className="text-slate-500">Busy:</span>
-                  <span className="font-mono">{stats.workerStats.busyWorkers}</span>
+                  <span className="font-mono">
+                    {stats.workerStats.busyWorkers}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-500">Total:</span>
-                  <span className="font-mono">{stats.workerStats.totalWorkers}</span>
+                  <span className="font-mono">
+                    {stats.workerStats.totalWorkers}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-500">Pending:</span>
-                  <span className="font-mono">{stats.workerStats.pendingTasks}</span>
+                  <span className="font-mono">
+                    {stats.workerStats.pendingTasks}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-500">Queued:</span>
-                  <span className="font-mono">{stats.workerStats.queuedTasks}</span>
+                  <span className="font-mono">
+                    {stats.workerStats.queuedTasks}
+                  </span>
                 </div>
               </div>
             </div>
@@ -102,7 +128,8 @@ export function ContinuousScannerStatus({ stats }: ContinuousScannerStatusProps)
                 <div className="flex items-center gap-2">
                   <Zap className="h-3 w-3 text-green-600" />
                   <span className="text-xs text-green-700 dark:text-green-300 font-medium">
-                    High Performance: {utilizationPercentage}% worker utilization
+                    High Performance: {utilizationPercentage}% worker
+                    utilization
                   </span>
                 </div>
               </div>
@@ -124,7 +151,8 @@ export function ContinuousScannerStatus({ stats }: ContinuousScannerStatusProps)
                 <div className="flex items-center gap-2">
                   <AlertTriangle className="h-3 w-3 text-orange-600" />
                   <span className="text-xs text-orange-700 dark:text-orange-300">
-                    Rate limited {stats.rateLimitHits} times - using fallback data
+                    Rate limited {stats.rateLimitHits} times - using fallback
+                    data
                   </span>
                 </div>
               </div>

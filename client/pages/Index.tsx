@@ -86,7 +86,9 @@ export default function Index() {
   const [telegramStats, setTelegramStats] = useState(
     telegramService.getStats(),
   );
-  const [scannerStats, setScannerStats] = useState(continuousScanner.getStats());
+  const [scannerStats, setScannerStats] = useState(
+    continuousScanner.getStats(),
+  );
   const [isAutoScanEnabled, setIsAutoScanEnabled] = useState(true);
   const [showCriteria, setShowCriteria] = useState(false);
   const [filters, setFilters] = useState<TokenFilter>({
@@ -114,9 +116,10 @@ export default function Index() {
         console.log(`Loaded ${data.length} tokens from continuous scanner`);
       } else {
         // Fallback to manual fetch
-        data = fetchMode === "comprehensive"
-          ? await fetchMultipleDataSources()
-          : await fetchSolanaTokens();
+        data =
+          fetchMode === "comprehensive"
+            ? await fetchMultipleDataSources()
+            : await fetchSolanaTokens();
         console.log(`Loaded ${data.length} tokens using ${fetchMode} mode`);
       }
 
@@ -138,7 +141,7 @@ export default function Index() {
     // Start continuous scanner on mount
     if (isAutoScanEnabled) {
       continuousScanner.start().then(() => {
-        console.log('🚀 Continuous scanner started automatically');
+        console.log("🚀 Continuous scanner started automatically");
       });
     }
 
@@ -166,11 +169,11 @@ export default function Index() {
     if (isAutoScanEnabled) {
       continuousScanner.stop();
       setIsAutoScanEnabled(false);
-      console.log('🛑 Continuous scanning stopped');
+      console.log("🛑 Continuous scanning stopped");
     } else {
       await continuousScanner.start();
       setIsAutoScanEnabled(true);
-      console.log('🚀 Continuous scanning started');
+      console.log("🚀 Continuous scanning started");
     }
   }, [isAutoScanEnabled]);
 
@@ -265,13 +268,16 @@ export default function Index() {
                   size="sm"
                   className={cn(
                     "gap-2",
-                    isAutoScanEnabled && "bg-green-600 hover:bg-green-700 text-white"
+                    isAutoScanEnabled &&
+                      "bg-green-600 hover:bg-green-700 text-white",
                   )}
                 >
-                  <Activity className={cn(
-                    "h-4 w-4",
-                    isAutoScanEnabled && "animate-pulse"
-                  )} />
+                  <Activity
+                    className={cn(
+                      "h-4 w-4",
+                      isAutoScanEnabled && "animate-pulse",
+                    )}
+                  />
                   {isAutoScanEnabled ? "AUTO-SCAN ON" : "START AUTO-SCAN"}
                 </Button>
                 <Button
@@ -344,7 +350,10 @@ export default function Index() {
                           <li>
                             • Supporting: Volume increase or decent volume
                           </li>
-                          <li>🛡️ <strong>SAFETY: Under $2M market cap only</strong></li>
+                          <li>
+                            🛡️{" "}
+                            <strong>SAFETY: Under $2M market cap only</strong>
+                          </li>
                           <li>• Supporting: MACD crossover signal</li>
                           <li>• Supporting: Technical MA signals</li>
                           <li>• Need: 3+ supporting conditions</li>

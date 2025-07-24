@@ -89,7 +89,9 @@ export function WorkerStatus() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Shield className="h-4 w-4 text-purple-600" />
-            <span className="text-sm">Proxy Rotation: {proxyStats.totalProxies} proxies</span>
+            <span className="text-sm">
+              Proxy Rotation: {proxyStats.totalProxies} proxies
+            </span>
           </div>
           <Badge variant="outline" className="text-purple-600">
             {proxyStats.assignedWorkers} assigned

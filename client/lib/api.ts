@@ -436,7 +436,11 @@ export function filterTokens(
     }
 
     // Safety filter: only show tokens under 2M market cap for lower risk
-    if (filters.maxMarketCap && token.marketCap && token.marketCap > filters.maxMarketCap) {
+    if (
+      filters.maxMarketCap &&
+      token.marketCap &&
+      token.marketCap > filters.maxMarketCap
+    ) {
       return false;
     }
 
@@ -444,7 +448,9 @@ export function filterTokens(
     return true;
   });
 
-  console.log(`✅ Found ${filtered.length} tokens after filtering (under ${filters.maxMarketCap ? '$' + (filters.maxMarketCap / 1000000).toFixed(1) + 'M' : 'no'} market cap limit)`);
+  console.log(
+    `✅ Found ${filtered.length} tokens after filtering (under ${filters.maxMarketCap ? "$" + (filters.maxMarketCap / 1000000).toFixed(1) + "M" : "no"} market cap limit)`,
+  );
   return filtered;
 }
 

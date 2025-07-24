@@ -167,7 +167,7 @@ export class WorkerPool {
     // Add worker ID to message for proxy routing
     const messageWithWorker = {
       ...task.message,
-      workerId: worker.id
+      workerId: worker.id,
     };
 
     // Stagger requests to avoid overwhelming APIs

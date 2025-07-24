@@ -27,7 +27,7 @@ export interface WorkerResponse {
 const API_BASE = "/api";
 
 class TokenFetcher {
-  private workerId: string = '';
+  private workerId: string = "";
 
   setWorkerId(id: string) {
     this.workerId = id;
