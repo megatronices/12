@@ -145,7 +145,7 @@ class ContinuousScanner {
       } catch (error) {
         console.warn(`⚠️ Endpoint ${endpoint} failed:`, error);
       }
-    }, 3000); // Every 3 seconds
+    }, 10000); // Every 10 seconds to avoid rate limits
     
     this.scanIntervals.push(rotationInterval);
   }
