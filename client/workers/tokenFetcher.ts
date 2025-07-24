@@ -1,5 +1,6 @@
 // Web Worker for fetching token data in parallel
 import { TokenPair } from "@shared/types";
+import { proxyRotator } from "../lib/proxyRotator";
 
 export interface WorkerMessage {
   id: string;
