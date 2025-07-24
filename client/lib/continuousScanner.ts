@@ -7,15 +7,11 @@ class ContinuousScanner {
   private isRunning = false;
   private scanIntervals: NodeJS.Timeout[] = [];
   private readonly SCAN_INTERVALS = [
-    5000,   // 5 seconds
-    7000,   // 7 seconds
-    10000,  // 10 seconds
-    12000,  // 12 seconds
     15000,  // 15 seconds
-    18000,  // 18 seconds
     20000,  // 20 seconds
     25000,  // 25 seconds
     30000,  // 30 seconds
+    35000,  // 35 seconds
   ];
   
   private readonly ENDPOINTS = [
