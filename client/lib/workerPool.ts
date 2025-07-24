@@ -1,5 +1,6 @@
 import { TokenPair } from "@shared/types";
 import { WorkerMessage, WorkerResponse } from "../workers/tokenFetcher";
+import { proxyRotator } from "./proxyRotator";
 
 interface PoolWorker {
   worker: Worker;
@@ -26,9 +27,9 @@ export class WorkerPool {
   private pendingTasks: PendingTask[] = [];
   private taskQueue: PendingTask[] = [];
   private initialized = false;
-  private readonly WORKER_COUNT = 20; // Use 20 workers for optimal performance
-  private readonly TASK_TIMEOUT = 30000; // 30 second timeout
-  private readonly CACHE_DURATION = 35 * 60 * 1000; // 35 minutes cache duration
+  private readonly WORKER_COUNT = 15; // Reduced to avoid rate limits
+  private readonly TASK_TIMEOUT = 15000; // 15 second timeout for faster failures
+  private readonly CACHE_DURATION = 2 * 60 * 1000; // 2 minutes cache for high-frequency scanning
   private readonly CACHE_KEY_PREFIX = "bullish-scanner-cache-";
 
   async initialize(): Promise<void> {
@@ -55,6 +56,9 @@ export class WorkerPool {
           new URL("../workers/tokenFetcher.ts", import.meta.url),
           { type: "module" },
         );
+
+        // Assign proxy to this worker
+        const assignedProxy = proxyRotator.assignProxyToWorker(id);
 
         const poolWorker: PoolWorker = {
           worker,
@@ -160,7 +164,17 @@ export class WorkerPool {
       }
     }, this.TASK_TIMEOUT);
 
-    worker.worker.postMessage(task.message);
+    // Add worker ID to message for proxy routing
+    const messageWithWorker = {
+      ...task.message,
+      workerId: worker.id,
+    };
+
+    // Stagger requests to avoid overwhelming APIs
+    const delay = proxyRotator.getRequestDelay(worker.id);
+    setTimeout(() => {
+      worker.worker.postMessage(messageWithWorker);
+    }, delay);
   }
 
   async execute<T = any>(

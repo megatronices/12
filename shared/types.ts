@@ -80,4 +80,5 @@ export interface TokenFilter {
   maxAge?: number; // in hours
   minLiquidity?: number;
   onlyWithMA?: boolean;
+  maxMarketCap?: number;
 }

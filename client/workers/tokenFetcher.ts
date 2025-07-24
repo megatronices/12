@@ -1,9 +1,11 @@
 // Web Worker for fetching token data in parallel
 import { TokenPair } from "@shared/types";
+import { proxyRotator } from "../lib/proxyRotator";
 
 export interface WorkerMessage {
   id: string;
   type: "FETCH_TOKENS" | "FETCH_TRENDING" | "FETCH_SPECIFIC";
+  workerId?: string;
   payload: {
     endpoint?: string;
     params?: Record<string, any>;
@@ -25,6 +27,12 @@ export interface WorkerResponse {
 const API_BASE = "/api";
 
 class TokenFetcher {
+  private workerId: string = "";
+
+  setWorkerId(id: string) {
+    this.workerId = id;
+  }
+
   private async fetchWithRetry(
     url: string,
     maxRetries: number = 3,
@@ -33,8 +41,13 @@ class TokenFetcher {
 
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
+        // Get proxy configuration for this worker
+        const proxyConfig = proxyRotator.getProxyConfig(this.workerId);
+
         const response = await fetch(url, {
+          ...proxyConfig,
           headers: {
+            ...proxyConfig.headers,
             Accept: "application/json",
             "Content-Type": "application/json",
           },
@@ -92,7 +105,12 @@ const fetcher = new TokenFetcher();
 
 // Handle messages from main thread
 self.addEventListener("message", async (event: MessageEvent<WorkerMessage>) => {
-  const { id, type, payload } = event.data;
+  const { id, type, payload, workerId } = event.data;
+
+  // Set worker ID for proxy routing
+  if (workerId) {
+    fetcher.setWorkerId(workerId);
+  }
 
   try {
     let data;

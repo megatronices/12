@@ -2,14 +2,20 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Progress } from "./ui/progress";
-import { Activity, Zap, Clock, AlertCircle } from "lucide-react";
+import { Activity, Zap, Clock, AlertCircle, Shield } from "lucide-react";
 import { getWorkerPoolStats } from "../lib/api";
+import { proxyRotator } from "../lib/proxyRotator";
 
 interface WorkerStats {
   totalWorkers: number;
   busyWorkers: number;
   pendingTasks: number;
   queuedTasks: number;
+}
+
+interface ProxyStats {
+  totalProxies: number;
+  assignedWorkers: number;
 }
 
 export function WorkerStatus() {
@@ -19,12 +25,21 @@ export function WorkerStatus() {
     pendingTasks: 0,
     queuedTasks: 0,
   });
+  const [proxyStats, setProxyStats] = useState<ProxyStats>({
+    totalProxies: 0,
+    assignedWorkers: 0,
+  });
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     const updateStats = () => {
       const newStats = getWorkerPoolStats();
+      const newProxyStats = proxyRotator.getStats();
       setStats(newStats);
+      setProxyStats({
+        totalProxies: newProxyStats.totalProxies,
+        assignedWorkers: newProxyStats.assignedWorkers,
+      });
       setIsVisible(newStats.totalWorkers > 0);
     };
 
@@ -68,6 +83,18 @@ export function WorkerStatus() {
           </div>
           <Badge variant="outline" className={getUtilizationColor()}>
             {getUtilizationStatus()}
+          </Badge>
+        </div>
+
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Shield className="h-4 w-4 text-purple-600" />
+            <span className="text-sm">
+              Proxy Rotation: {proxyStats.totalProxies} proxies
+            </span>
+          </div>
+          <Badge variant="outline" className="text-purple-600">
+            {proxyStats.assignedWorkers} assigned
           </Badge>
         </div>
 
