@@ -105,7 +105,12 @@ const fetcher = new TokenFetcher();
 
 // Handle messages from main thread
 self.addEventListener("message", async (event: MessageEvent<WorkerMessage>) => {
-  const { id, type, payload } = event.data;
+  const { id, type, payload, workerId } = event.data;
+
+  // Set worker ID for proxy routing
+  if (workerId) {
+    fetcher.setWorkerId(workerId);
+  }
 
   try {
     let data;
