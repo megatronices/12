@@ -208,7 +208,7 @@ export function hasMAAlert(pair: TokenPair): boolean {
       volume5m: pair.volume?.m5,
       tokenAge: `${ageInDays.toFixed(1)} days old`,
       coreConditions: `${coreConditions} (needs: momentum + buy pressure + positive)`,
-      supportingScore: `${supportingConditions}/6 (needs ≥3)`,
+      supportingScore: `${supportingConditions}/8 (needs ≥3)`,
       checks: {
         strongMomentum: `${strongMomentum} (${priceChange5m.toFixed(2)}% ≥ 2%)`,
         goodBuyPressure: `${goodBuyPressure} (${buyPressure.toFixed(1)}% ≥ 55%)`,
