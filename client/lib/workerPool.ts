@@ -15,6 +15,12 @@ interface PendingTask {
   timeout: NodeJS.Timeout;
 }
 
+interface CachedData {
+  data: any;
+  timestamp: number;
+  expiry: number;
+}
+
 export class WorkerPool {
   private workers: PoolWorker[] = [];
   private pendingTasks: PendingTask[] = [];
@@ -22,6 +28,8 @@ export class WorkerPool {
   private initialized = false;
   private readonly WORKER_COUNT = 20; // Use 20 workers for optimal performance
   private readonly TASK_TIMEOUT = 30000; // 30 second timeout
+  private readonly CACHE_DURATION = 35 * 60 * 1000; // 35 minutes cache duration
+  private readonly CACHE_KEY_PREFIX = "bullish-scanner-cache-";
 
   async initialize(): Promise<void> {
     if (this.initialized) return;
